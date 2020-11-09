@@ -1,0 +1,1 @@
+# rika-firenet-custom-component
