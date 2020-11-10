@@ -18,9 +18,8 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=10)
 
 
 class RikaFirenetConnector:
-    def __init__(self, hass, host, username, password, default_temperature):
+    def __init__(self, hass, username, password, default_temperature):
         self.hass = hass
-        self._host = host
         self._username = username
         self._password = password
         self._default_temperature = default_temperature
@@ -48,7 +47,7 @@ class RikaFirenetConnector:
             'password': self._password
         }
 
-        postResponse = self._client.post(self._host + '/web/login', data)
+        postResponse = self._client.post('https://www.rika-firenet.com/web/login', data)
 
         if ('/logout' in postResponse.text) == False:
             raise Exception('Failed to connect with Rika Firenet')
@@ -69,12 +68,12 @@ class RikaFirenetConnector:
 
     def get_stove_state(self, id):
         self.connect()
-        return self._client.get(self._host + '/api/client/' + id + '/status?nocache=').json()
+        return self._client.get('https://www.rika-firenet.com/api/client/' + id + '/status?nocache=').json()
 
     def setup_stoves(self):
         self.connect()
         stoves = []
-        postResponse = self._client.get(self._host + '/web/summary')
+        postResponse = self._client.get('https://www.rika-firenet.com/web/summary')
 
         soup = BeautifulSoup(postResponse.content, "html.parser")
         stoveList = soup.find("ul", {"id": "stoveList"})
@@ -100,8 +99,7 @@ class RikaFirenetConnector:
     def set_stove_controls(self, id, data):
         _LOGGER.info("set_stove_control() id: " + id + " data: " + str(data))
 
-        r = self._client.post(
-            self._host + '/api/client/' + id + '/controls', data)
+        r = self._client.post('https://www.rika-firenet.com/api/client/' + id + '/controls', data)
 
         for counter in range(0, 10):
             if ('OK' in r.text) == True:

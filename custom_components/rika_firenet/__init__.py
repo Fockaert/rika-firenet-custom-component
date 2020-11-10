@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.event import async_track_time_interval
 
-from .const import (CONF_DEFAULT_TEMPERATURE, CONF_HOST, CONF_PASSWORD,
+from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD,
 					CONF_USERNAME, DOMAIN, PLATFORMS, STARTUP_MESSAGE)
 from .core import RikaFirenetConnector
 
@@ -30,12 +30,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
 
-    host = entry.data.get(CONF_HOST)
     username = entry.data.get(CONF_USERNAME)
     password = entry.data.get(CONF_PASSWORD)
     default_temperature = int(entry.data.get(CONF_DEFAULT_TEMPERATURE))
 
-    connector = RikaFirenetConnector(hass, host, username, password, default_temperature)
+    connector = RikaFirenetConnector(hass, username, password, default_temperature)
 
     try:
         await hass.async_add_executor_job(connector.setup)

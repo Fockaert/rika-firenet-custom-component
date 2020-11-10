@@ -3,7 +3,6 @@ from homeassistant.components.climate.const import (PRESET_AWAY,
 
 # Configuration
 CONF_ENABLED = "enabled"
-CONF_HOST = "host"
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
 CONF_DEFAULT_TEMPERATURE = "defaultTemperature"
