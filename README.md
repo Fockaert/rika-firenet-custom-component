@@ -10,7 +10,9 @@ Platform | Description
 `sensor` | ...
 
 ## Planning
+* Add readme example graphs possible
 * Support DataUpdateCoordinator from blueprint instead of Tado implemention
+* Get the config flow working with update and platform selections
 * Support preset mode (in comment atm)
 * Support smart target temperature. e.g. Show base temperature when active
 * Support Rika stove without external thermostat (only tested with external thermostat)
@@ -28,7 +30,35 @@ Platform | Description
 
 ## Configuration is done in the UI
 
-<!---->
+Utility meters example:
+```yaml
+utility_meter:
+  hourly_stove_consumption:
+    source: sensor.<stove>_stove_consumption
+    cycle: hourly
+  daily_stove_consumption:
+    source: sensor.<stove>_stove_consumption
+    cycle: daily
+  weekly_stove_consumption:
+    source: sensor.<stove>_stove_consumption
+    cycle: weekly
+  monthly_stove_consumption:
+    source: sensor.<stove>_stove_consumption
+    cycle: monthly
+
+  hourly_stove_runtime:
+    source: sensor.<stove>_stove_runtime
+    cycle: hourly
+  daily_stove_runtime:
+    source: sensor.<stove>_stove_runtime
+    cycle: daily
+  weekly_stove_runtime:
+    source: sensor.<stove>_stove_runtime
+    cycle: weekly
+  monthly_stove_runtime:
+    source: sensor.<stove>_stove_runtime
+    cycle: monthly
+```
 
 ## Contributions are welcome!
 
