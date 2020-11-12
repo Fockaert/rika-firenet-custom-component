@@ -5,19 +5,18 @@ from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 from homeassistant.components.climate.const import (HVAC_MODE_AUTO,
-													HVAC_MODE_HEAT,
-													HVAC_MODE_OFF, PRESET_AWAY,
-													PRESET_HOME)
-from homeassistant.helpers.dispatcher import dispatcher_send
-from homeassistant.util import Throttle
-
-from .const import SIGNAL_RIKA_FIRENET_UPDATE_RECEIVED
+                                                    HVAC_MODE_HEAT,
+                                                    HVAC_MODE_OFF, PRESET_AWAY,
+                                                    PRESET_HOME)
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=10)
+SCAN_INTERVAL = timedelta(seconds=15)
 
 
-class RikaFirenetConnector:
+class RikaFirenetCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, username, password, default_temperature):
         self.hass = hass
         self._username = username
@@ -26,6 +25,20 @@ class RikaFirenetConnector:
         self._client = None
         self._stoves = None
         self.platforms = []
+
+        super().__init__(
+            hass,
+            _LOGGER,
+            name=DOMAIN,
+            update_method=self.async_update_data,
+            update_interval=SCAN_INTERVAL
+        )
+
+    async def async_update_data(self):
+        try:
+            await self.hass.async_add_executor_job(self.update)
+        except Exception as exception:
+            raise UpdateFailed(exception)
 
     def setup(self):
         _LOGGER.info("setup()")
@@ -49,7 +62,7 @@ class RikaFirenetConnector:
 
         postResponse = self._client.post('https://www.rika-firenet.com/web/login', data)
 
-        if ('/logout' in postResponse.text) == False:
+        if not ('/logout' in postResponse.text):
             raise Exception('Failed to connect with Rika Firenet')
         else:
             _LOGGER.info('Connected to Rika Firenet')
@@ -90,7 +103,6 @@ class RikaFirenetConnector:
 
         return stoves
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         _LOGGER.info("update()")
         for stove in self._stoves:
@@ -113,8 +125,8 @@ class RikaFirenetConnector:
 
 
 class RikaFirenetStove:
-    def __init__(self, connector: RikaFirenetConnector, id, name):
-        self._connector = connector
+    def __init__(self, coordinator: RikaFirenetCoordinator, id, name):
+        self._coordinator = coordinator
         self._id = id
         self._name = name
         self._previous_temperature = None
@@ -137,18 +149,7 @@ class RikaFirenetStove:
 
     def sync_state_internal(self, send_message):
         _LOGGER.debug("Updating stove %s", self._id)
-        self._state = self._connector.get_stove_state(self._id)
-
-        if send_message:
-            _LOGGER.debug(
-                "Dispatching update to stove %s: %s",
-                self._id,
-                self._state,
-            )
-            dispatcher_send(
-                self._connector.hass,
-                SIGNAL_RIKA_FIRENET_UPDATE_RECEIVED.format(self._id),
-            )
+        self._state = self._coordinator.get_stove_state(self._id)
 
     def set_stove_temperature(self, temperature):
         _LOGGER.info("set_stove_temperature(): " + str(temperature))
@@ -156,7 +157,7 @@ class RikaFirenetStove:
         data = self.get_control_state()
         data['targetTemperature'] = str(temperature)
 
-        self._connector.set_stove_controls(self._id, data)
+        self._coordinator.set_stove_controls(self._id, data)
         self.sync_state()
 
     def get_control_state(self):
@@ -175,7 +176,7 @@ class RikaFirenetStove:
                 self.set_stove_temperature(self._previous_temperature)
             else:
                 self.set_stove_temperature(
-                    self._connector.get_default_temperature())
+                    self._coordinator.get_default_temperature())
             self._previous_temperature = None
 
     def get_state(self):
@@ -253,7 +254,7 @@ class RikaFirenetStove:
         data['onOff'] = True
         data['heatingTimesActiveForComfort'] = active
 
-        self._connector.set_stove_controls(self._id, data)
+        self._coordinator.set_stove_controls(self._id, data)
         self.sync_state()
 
     def turn_off(self):
@@ -262,7 +263,7 @@ class RikaFirenetStove:
         data = self.get_control_state()
         data['onOff'] = False
 
-        self._connector.set_stove_controls(self._id, data)
+        self._coordinator.set_stove_controls(self._id, data)
         self.sync_state()
 
     def get_status(self):

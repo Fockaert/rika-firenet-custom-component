@@ -20,7 +20,6 @@ SUPPORT_PRESET = [PRESET_AWAY, PRESET_HOME]
 VERSION = "0.0.1"
 DOMAIN = "rika_firenet"
 
-SIGNAL_RIKA_FIRENET_UPDATE_RECEIVED = "rika_firenet_update_received_device_{}"
 UNIQUE_ID = "unique_id"
 
 DEFAULT_NAME = "Rika"
