@@ -6,10 +6,11 @@
         "title": "Rika Firenet",
         "description": "Setup integration with Rika Firenet",
         "data": {
-          "host": "Host",
           "username": "Username",
           "password": "Password",
-          "defaultTemperature": "Default temperature"
+          "defaultTemperature": "Default temperature",
+          "climate": "Climate enabled",
+          "sensor": "Sensor enabled"
         }
       }
     },
@@ -24,6 +25,9 @@
     "step": {
       "user": {
         "data": {
+          "username": "Username",
+          "password": "Password",
+          "defaultTemperature": "Default temperature",
           "climate": "Climate enabled",
           "sensor": "Sensor enabled"
         }
