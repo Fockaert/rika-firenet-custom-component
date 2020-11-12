@@ -2,8 +2,8 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-from .const import (CONF_DEFAULT_TEMPERATURE,CONF_PASSWORD, CONF_USERNAME,DOMAIN, PLATFORMS)
-from .core import RikaFirenetConnector
+from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD, CONF_USERNAME, DOMAIN, PLATFORMS)
+from .core import RikaFirenetCoordinator
 
 
 class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -64,9 +64,9 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     async def _test_credentials(self, username, password, default_temperature):
         """Return true if credentials is valid."""
         try:
-            connector = RikaFirenetConnector(
+            coordinator = RikaFirenetCoordinator(
                 None, username, password, default_temperature)
-            connector.setup()
+            coordinator.setup()
             return True
         except Exception:  # pylint: disable=broad-except
             pass

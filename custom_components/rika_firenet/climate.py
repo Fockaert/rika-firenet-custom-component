@@ -2,16 +2,14 @@ import logging
 
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (HVAC_MODE_AUTO,
-													HVAC_MODE_HEAT,
-													HVAC_MODE_OFF,
-													SUPPORT_TARGET_TEMPERATURE)
+                                                    HVAC_MODE_HEAT,
+                                                    HVAC_MODE_OFF,
+                                                    SUPPORT_TARGET_TEMPERATURE)
 from homeassistant.const import (ATTR_TEMPERATURE, TEMP_CELSIUS)
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import (DOMAIN,
-					SIGNAL_RIKA_FIRENET_UPDATE_RECEIVED, SUPPORT_PRESET)
-from .core import RikaFirenetConnector, RikaFirenetStove
+from .const import (DOMAIN, SUPPORT_PRESET)
+from .core import RikaFirenetCoordinator, RikaFirenetStove
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,56 +26,28 @@ HVAC_MODES = [HVAC_MODE_AUTO, HVAC_MODE_HEAT, HVAC_MODE_OFF]
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up platform."""
     _LOGGER.info("setting up platform climate")
-    # _LOGGER.info("data from domain" + str(hass.data[DOMAIN]))
-    connector: RikaFirenetConnector = hass.data[DOMAIN][entry.entry_id]
+    coordinator: RikaFirenetCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     stove_entities = []
 
     # Create stove sensors
-    for stove in connector.get_stoves():
-        stove_entities.append(RikaFirenetStoveClimate(stove))
+    for stove in coordinator.get_stoves():
+        stove_entities.append(RikaFirenetStoveClimate(stove, coordinator))
 
     if stove_entities:
         async_add_entities(stove_entities, True)
 
 
-class RikaFirenetStoveClimate(ClimateEntity):
-    """Representation of an RikaStove."""
+class RikaFirenetStoveClimate(CoordinatorEntity, ClimateEntity):
 
-    def __init__(self, stove: RikaFirenetStove):
-        """Initialize of the Tado Sensor."""
+    def __init__(self, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator):
         self._id = stove.get_id()
         self._name = stove.get_name()
         self._stove = stove
         self.device_id = self._id
         self._unique_id = self._id
 
-    async def async_added_to_hass(self):
-        """Register for sensor updates."""
-
-        self.async_on_remove(
-            async_dispatcher_connect(
-                self.hass,
-                SIGNAL_RIKA_FIRENET_UPDATE_RECEIVED.format(
-                    self.device_id
-                ),
-                self._async_update_callback,
-            )
-        )
-        self._async_update_device_data()
-
-    @callback
-    def _async_update_callback(self):
-        """Update and write state."""
-        _LOGGER.info("_async_update_callback()")
-        self._async_update_device_data()
-        self.async_write_ha_state()
-
-    @callback
-    def _async_update_device_data(self):
-        """Handle update callbacks."""
-
-    # _LOGGER.info("new state: " + str(self._state))
+        super().__init__(coordinator)
 
     @property
     def unique_id(self):

@@ -11,7 +11,6 @@ Platform | Description
 
 ## Planning
 * Add readme example graphs possible
-* Support DataUpdateCoordinator from blueprint instead of Tado implemention
 * Get the config flow working with update and platform selections
 * Support preset mode (in comment atm)
 * Support smart target temperature. e.g. Show base temperature when active
