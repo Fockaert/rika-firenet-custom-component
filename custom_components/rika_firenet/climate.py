@@ -6,20 +6,18 @@ from homeassistant.components.climate.const import (HVAC_MODE_AUTO,
                                                     HVAC_MODE_OFF,
                                                     SUPPORT_TARGET_TEMPERATURE)
 from homeassistant.const import (ATTR_TEMPERATURE, TEMP_CELSIUS)
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (DOMAIN, SUPPORT_PRESET)
-from .core import RikaFirenetCoordinator, RikaFirenetStove
+from .core import RikaFirenetCoordinator
+from .entity import RikaFirenetEntity
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE  # | SUPPORT_PRESET_MODE
 
-# from the remote control and gree app
 MIN_TEMP = 16
 MAX_TEMP = 30
 
-# fixed values in gree mode lists
 HVAC_MODES = [HVAC_MODE_AUTO, HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
 
@@ -32,32 +30,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     # Create stove sensors
     for stove in coordinator.get_stoves():
-        stove_entities.append(RikaFirenetStoveClimate(stove, coordinator))
+        stove_entities.append(RikaFirenetStoveClimate(entry, stove, coordinator))
 
     if stove_entities:
         async_add_entities(stove_entities, True)
 
 
-class RikaFirenetStoveClimate(CoordinatorEntity, ClimateEntity):
-
-    def __init__(self, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator):
-        self._id = stove.get_id()
-        self._name = stove.get_name()
-        self._stove = stove
-        self.device_id = self._id
-        self._unique_id = self._id
-
-        super().__init__(coordinator)
-
-    @property
-    def unique_id(self):
-        """Return the unique id."""
-        return self._unique_id
-
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return self._name
+class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
 
     @property
     def current_temperature(self):
@@ -85,8 +64,6 @@ class RikaFirenetStoveClimate(CoordinatorEntity, ClimateEntity):
     @property
     def target_temperature(self):
         temp = self._stove.get_room_thermostat()
-        _LOGGER.info('target_temperature()): ' + str(temp))
-        # Return the supported step of target temperature.
         return temp
 
     @property

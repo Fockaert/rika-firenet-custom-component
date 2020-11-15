@@ -1,12 +1,9 @@
-import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
 from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD, CONF_USERNAME, DOMAIN, PLATFORMS)
 from .core import RikaFirenetCoordinator
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -19,7 +16,6 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-        _LOGGER.info("0_async_step_user:" + str(user_input))
         self._errors = {}
 
         # Uncomment the next 2 lines if only a single instance of the integration is allowed:
@@ -28,7 +24,7 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             valid = await self._test_credentials(
-                user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_DEFAULT_TEMPERATURE]
+                user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
             )
             if valid:
                 return self.async_create_entry(
@@ -48,7 +44,6 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _show_config_form(self, user_input):  # pylint: disable=unused-argument
         """Show the configuration form to edit data."""
-        _LOGGER.info("_show_config_form:" + str(user_input))
 
         if user_input is None:
             user_input = {}
@@ -56,13 +51,7 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         schema_properties = {
             vol.Required(CONF_USERNAME, default=user_input.get(CONF_USERNAME, None)): str,
             vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, None)): str,
-            vol.Required(CONF_DEFAULT_TEMPERATURE, default=user_input.get(CONF_DEFAULT_TEMPERATURE, 21)): int
         }
-
-        schema_properties.update({
-            vol.Required(x, default=user_input.get(x, True)): bool
-            for x in sorted(PLATFORMS)
-        })
 
         return self.async_show_form(
             step_id="user",
@@ -70,11 +59,11 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=self._errors,
         )
 
-    async def _test_credentials(self, username, password, default_temperature):
+    async def _test_credentials(self, username, password):
         """Return true if credentials is valid."""
         try:
             coordinator = RikaFirenetCoordinator(
-                None, username, password, default_temperature)
+                None, username, password, 21)
             coordinator.setup()
             return True
         except Exception:  # pylint: disable=broad-except
@@ -87,9 +76,7 @@ class RikaFirenetOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry):
         """Initialize HACS options flow."""
         self.config_entry = config_entry
-        self.data = dict(config_entry.data)
-        _LOGGER.info("RikaFirenetOptionsFlowHandler: options:" + str(config_entry.options))
-        _LOGGER.info("RikaFirenetOptionsFlowHandler: data:" + str(config_entry.data))
+        self.options = dict(config_entry.options)
 
     async def async_step_init(self, user_input=None):  # pylint: disable=unused-argument
         """Manage the options."""
@@ -97,21 +84,17 @@ class RikaFirenetOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-        _LOGGER.info("async_step_user: user_input: " + str(user_input))
-        _LOGGER.info("async_step_user: data: " + str(self.data))
 
         if user_input is not None:
-            self.data.update(user_input)
+            self.options.update(user_input)
             return await self._update_options()
 
         schema_properties = {
-            vol.Required(CONF_USERNAME, default=self.data.get(CONF_USERNAME)): str,
-            vol.Required(CONF_PASSWORD, default=self.data.get(CONF_PASSWORD)): str,
-            vol.Required(CONF_DEFAULT_TEMPERATURE, default=self.data.get(CONF_DEFAULT_TEMPERATURE)): int
+            vol.Required(CONF_DEFAULT_TEMPERATURE, default=self.options.get(CONF_DEFAULT_TEMPERATURE)): int
         }
 
         schema_properties.update({
-            vol.Required(x, default=self.data.get(x, True)): bool
+            vol.Required(x, default=self.options.get(x, True)): bool
             for x in sorted(PLATFORMS)
         })
 
@@ -123,5 +106,5 @@ class RikaFirenetOptionsFlowHandler(config_entries.OptionsFlow):
     async def _update_options(self):
         """Update config entry options."""
         return self.async_create_entry(
-            title=self.config_entry.data.get(CONF_USERNAME), data=self.data
+            title=self.config_entry.data.get(CONF_USERNAME), data=self.options
         )

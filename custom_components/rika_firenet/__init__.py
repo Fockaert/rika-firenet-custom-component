@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     username = entry.data.get(CONF_USERNAME)
     password = entry.data.get(CONF_PASSWORD)
-    default_temperature = int(entry.data.get(CONF_DEFAULT_TEMPERATURE))
+    default_temperature = int(entry.options.get(CONF_DEFAULT_TEMPERATURE, 21))
 
     coordinator = RikaFirenetCoordinator(hass, username, password, default_temperature)
 

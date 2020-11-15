@@ -1,10 +1,9 @@
 import logging
 
 from homeassistant.const import TEMP_CELSIUS, TIME_HOURS, MASS_KILOGRAMS
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from .entity import RikaFirenetEntity
 
 from .const import (
-    DEFAULT_NAME,
     DOMAIN
 )
 from .core import RikaFirenetCoordinator
@@ -35,7 +34,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for stove in coordinator.get_stoves():
         stove_entities.extend(
             [
-                RikaFirenetStoveSensor(stove, coordinator, sensor)
+                RikaFirenetStoveSensor(entry, stove, coordinator, sensor)
                 for sensor in DEVICE_SENSORS
             ]
         )
@@ -44,24 +43,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
         async_add_entities(stove_entities, True)
 
 
-class RikaFirenetStoveSensor(CoordinatorEntity):
-    def __init__(self, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, sensor):
-        self._id = stove.get_id()
-        self._name = stove.get_name()
-        self._stove = stove
+class RikaFirenetStoveSensor(RikaFirenetEntity):
+    def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, sensor):
+        super().__init__(config_entry, stove, coordinator, sensor)
+
         self._sensor = sensor
-        self.device_id = self._id
-
-        self._unique_id = f"{sensor} {self._name}"
-        super().__init__(coordinator)
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-
-    @property
-    def name(self):
-        return f"{self._name} {self._sensor}"
 
     @property
     def state(self):
@@ -105,14 +91,3 @@ class RikaFirenetStoveSensor(CoordinatorEntity):
             return "mdi:fire"
         elif self._sensor == "stove status":
             return "mdi:information-outline"
-
-    @property
-    def device_info(self):
-        info = {
-            "identifiers": {(DOMAIN, self._id)},
-            "name": self._id,
-            "manufacturer": DEFAULT_NAME,
-            "model": DEFAULT_NAME,
-        }
-        _LOGGER.info("info:" + str(info))
-        return info
