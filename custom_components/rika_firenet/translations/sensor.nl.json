@@ -1,0 +1,18 @@
+{
+  "state": {
+    "Frost protection": "Vorst beveiliging",
+    "Stove off": "Kachel uit",
+    "Standby": "Standby_NL",
+    "External Request": "Extern contact",
+    "Substate Unknown": "Substate onbekend",
+    "Ignition on": "Ontsteken",
+    "Starting up": "Opstarten",
+    "Running": "Pelletmodule",
+    "Big Clean": "Grote Reiniging",
+    "Clean": "Reiniging",
+    "Burn off": "Uitdoven",
+    "Split log check": "Hout check",
+    "Split log mode": "Regeling Hout",
+    "Unknown": "Onbekend"
+  }
+}

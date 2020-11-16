@@ -267,39 +267,39 @@ class RikaFirenetStove:
         self.sync_state()
 
     def get_status(self):
-        mainState = self._state['sensors']['statusMainState']
-        subState = self._state['sensors']['statusSubState']
-        frostStarted = self._state['sensors']['statusFrostStarted']
+        main_state = self._state['sensors']['statusMainState']
+        sub_state = self._state['sensors']['statusSubState']
+        frost_started = self._state['sensors']['statusFrostStarted']
 
-        if frostStarted:
-            return ["/images/status/Visu_Freeze.svg", "Vorstbeveiliging"]
+        if frost_started:
+            return ["/images/status/Visu_Freeze.svg", "Frost protection"]
 
-        if mainState == 1:
-            if subState == 0:
-                return ["/images/status/Visu_Off.svg", "Kachel uit"]
-            elif subState == 1:
+        if main_state == 1:
+            if sub_state == 0:
+                return ["/images/status/Visu_Off.svg", "Stove off"]
+            elif sub_state == 1:
                 return ["/images/status/Visu_Standby.svg", "Standby"]
-            elif subState == 2:
-                return ["/images/status/Visu_Standby.svg", "Extern contact"]
-            elif subState == 3:
+            elif sub_state == 2:
+                return ["/images/status/Visu_Standby.svg", "External Request"]
+            elif sub_state == 3:
                 return ["/images/status/Visu_Standby.svg", "Standby"]
-            return ["/images/status/Visu_Off.svg", "Substate onbekend"]
-        elif mainState == 2:
-            return ["/images/status/Visu_Ignition.svg", "Ontsteken"]
-        elif mainState == 3:
-            return ["/images/status/Visu_Ignition.svg", "Startfase"]
-        elif mainState == 4:
-            return ["/images/status/Visu_Control.svg", "Pelletmodule"]
-        elif mainState == 5:
-            if subState == 3 or subState == 4:
-                return ["/images/status/Visu_Clean.svg", "Grote Reiniging"]
+            return ["/images/status/Visu_Off.svg", "sub_state Unknown"]
+        elif main_state == 2:
+            return ["/images/status/Visu_Ignition.svg", "Ignition on"]
+        elif main_state == 3:
+            return ["/images/status/Visu_Ignition.svg", "Starting up"]
+        elif main_state == 4:
+            return ["/images/status/Visu_Control.svg", "Running"]
+        elif main_state == 5:
+            if sub_state == 3 or sub_state == 4:
+                return ["/images/status/Visu_Clean.svg", "Big Clean"]
             else:
-                return ["/images/status/Visu_Clean.svg", "Reiniging"]
-        elif mainState == 6:
-            return ["/images/status/Visu_BurnOff.svg", "Uitdoven"]
-        elif mainState == 11 or mainState == 13 or mainState == 14 or mainState == 16 or mainState == 17 or mainState == 50:
-            return ["/images/status/Visu_SpliLog.svg", "Hout check"]
-        elif mainState == 20 or mainState == 21:
-            return ["/images/status/Visu_SpliLog.svg", "Regeling Hout"]
+                return ["/images/status/Visu_Clean.svg", "Clean"]
+        elif main_state == 6:
+            return ["/images/status/Visu_BurnOff.svg", "Burn off"]
+        elif main_state == 11 or main_state == 13 or main_state == 14 or main_state == 16 or main_state == 17 or main_state == 50:
+            return ["/images/status/Visu_SpliLog.svg", "Split log check"]
+        elif main_state == 20 or main_state == 21:
+            return ["/images/status/Visu_SpliLog.svg", "Split log mode"]
 
-        return ["/images/status/Visu_Off.svg", "Onbekend"]
+        return ["/images/status/Visu_Off.svg", "Unknown"]
