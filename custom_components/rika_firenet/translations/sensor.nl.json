@@ -1,18 +1,20 @@
 {
   "state": {
-    "Frost protection": "Vorst beveiliging",
-    "Stove off": "Kachel uit",
-    "Standby": "Standby_NL",
-    "External Request": "Extern contact",
-    "Substate Unknown": "Substate onbekend",
-    "Ignition on": "Ontsteken",
-    "Starting up": "Opstarten",
-    "Running": "Pelletmodule",
-    "Big Clean": "Grote Reiniging",
-    "Clean": "Reiniging",
-    "Burn off": "Uitdoven",
-    "Split log check": "Hout check",
-    "Split log mode": "Regeling Hout",
-    "Unknown": "Onbekend"
+    "_": {
+      "frost_protection": "Vorst beveiliging",
+      "stove_off": "Kachel uit",
+      "standby": "Standby",
+      "external_request": "Extern contact",
+      "sub_state_unknown": "Substate onbekend",
+      "ignition_on": "Ontsteken",
+      "starting_up": "Opstarten",
+      "running": "Pelletmodule",
+      "big_clean": "Grote Reiniging",
+      "clean": "Reiniging",
+      "burn_off": "Uitdoven",
+      "split_log_check": "Hout check",
+      "split_log_mode": "Regeling Hout",
+      "unknown": "Onbekend"
+    }
   }
 }

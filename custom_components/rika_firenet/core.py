@@ -272,34 +272,34 @@ class RikaFirenetStove:
         frost_started = self._state['sensors']['statusFrostStarted']
 
         if frost_started:
-            return ["/images/status/Visu_Freeze.svg", "Frost protection"]
+            return ["/images/status/Visu_Freeze.svg", "frost_protection"]
 
         if main_state == 1:
             if sub_state == 0:
-                return ["/images/status/Visu_Off.svg", "Stove off"]
+                return ["/images/status/Visu_Off.svg", "stove_off"]
             elif sub_state == 1:
-                return ["/images/status/Visu_Standby.svg", "Standby"]
+                return ["/images/status/Visu_Standby.svg", "standby"]
             elif sub_state == 2:
-                return ["/images/status/Visu_Standby.svg", "External Request"]
+                return ["/images/status/Visu_Standby.svg", "external_request"]
             elif sub_state == 3:
-                return ["/images/status/Visu_Standby.svg", "Standby"]
-            return ["/images/status/Visu_Off.svg", "sub_state Unknown"]
+                return ["/images/status/Visu_Standby.svg", "standby"]
+            return ["/images/status/Visu_Off.svg", "sub_state_unknown"]
         elif main_state == 2:
-            return ["/images/status/Visu_Ignition.svg", "Ignition on"]
+            return ["/images/status/Visu_Ignition.svg", "ignition_on"]
         elif main_state == 3:
-            return ["/images/status/Visu_Ignition.svg", "Starting up"]
+            return ["/images/status/Visu_Ignition.svg", "starting_up"]
         elif main_state == 4:
-            return ["/images/status/Visu_Control.svg", "Running"]
+            return ["/images/status/Visu_Control.svg", "running"]
         elif main_state == 5:
             if sub_state == 3 or sub_state == 4:
-                return ["/images/status/Visu_Clean.svg", "Big Clean"]
+                return ["/images/status/Visu_Clean.svg", "big_clean"]
             else:
-                return ["/images/status/Visu_Clean.svg", "Clean"]
+                return ["/images/status/Visu_Clean.svg", "clean"]
         elif main_state == 6:
-            return ["/images/status/Visu_BurnOff.svg", "Burn off"]
+            return ["/images/status/Visu_BurnOff.svg", "burn_off"]
         elif main_state == 11 or main_state == 13 or main_state == 14 or main_state == 16 or main_state == 17 or main_state == 50:
-            return ["/images/status/Visu_SpliLog.svg", "Split log check"]
+            return ["/images/status/Visu_SpliLog.svg", "split_log_check"]
         elif main_state == 20 or main_state == 21:
-            return ["/images/status/Visu_SpliLog.svg", "Split log mode"]
+            return ["/images/status/Visu_SpliLog.svg", "split_log_mode"]
 
-        return ["/images/status/Visu_Off.svg", "Unknown"]
+        return ["/images/status/Visu_Off.svg", "unknown"]

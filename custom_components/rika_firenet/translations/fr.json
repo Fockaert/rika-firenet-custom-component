@@ -1,0 +1,32 @@
+{
+  "config": {
+    "title": "Rika Firenet",
+    "step": {
+      "user": {
+        "title": "Rika Firenet",
+        "description": "Setup integration with Rika Firenet",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "auth": "Username/Password is wrong."
+    },
+    "abort": {
+      "single_instance_allowed": "Only a single configuration of Rika Firenet is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "data": {
+          "defaultTemperature": "Default temperature",
+          "climate": "Climate enabled",
+          "sensor": "Sensor enabled"
+        }
+      }
+    }
+  }
+}

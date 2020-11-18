@@ -1,0 +1,20 @@
+{
+  "state": {
+    "_": {
+      "frost_protection": "Frost protection",
+      "stove_off": "Stove off",
+      "standby": "Standby",
+      "external_request": "External request",
+      "sub_state_unknown": "Substate unknown",
+      "ignition_on": "Ignition on",
+      "starting_up": "Starting up",
+      "running": "Running",
+      "big_clean": "Big clean",
+      "clean": "Clean",
+      "burn_off": "Burn off",
+      "split_log_check": "Split log check",
+      "split_log_mode": "Split log mode",
+      "unknown": "Unknown"
+    }
+  }
+}
