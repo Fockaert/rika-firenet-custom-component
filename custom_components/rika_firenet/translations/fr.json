@@ -28,5 +28,23 @@
         }
       }
     }
+  },
+  "state": {
+    "_": {
+      "frost_protection": "Mode hors gel",
+      "stove_off": "Poêle éteint",
+      "standby": "En veille",
+      "external_request": "Demande externe",
+      "sub_state_unknown": "Substate inconnu",
+      "ignition_on": "Allumage",
+      "starting_up": "Démarrage",
+      "running": "Baking",
+      "big_clean": "Nettoyage approfondi",
+      "clean": "Nettoyage",
+      "burn_off": "Fin de combustion",
+      "split_log_check": "Contrôle de la présence du bois",
+      "split_log_mode": "Mode bois",
+      "unknown": "Inconnu"
+    }
   }
 }

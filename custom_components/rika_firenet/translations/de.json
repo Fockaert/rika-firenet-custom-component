@@ -28,5 +28,23 @@
         }
       }
     }
+  },
+  "state": {
+    "_": {
+      "frost_protection": "Frostschutz",
+      "stove_off": "Ofen AUS",
+      "standby": "Standby",
+      "external_request": "Externe Anforderung",
+      "sub_state_unknown": "Substate unbekannt",
+      "ignition_on": "Zündung EIN",
+      "starting_up": "Startphase",
+      "running": "Backen",
+      "big_clean": "Gr. Reinigung",
+      "clean": "Reinigung",
+      "burn_off": "Ausbrand",
+      "split_log_check": "Scheitholzcheck",
+      "split_log_mode": "Scheitholzbetrieb",
+      "unknown": "Unbekanntes Problem"
+    }
   }
 }
