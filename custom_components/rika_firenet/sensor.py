@@ -1,6 +1,6 @@
 import logging
 
-from homeassistant.const import TEMP_CELSIUS, TIME_HOURS, MASS_KILOGRAMS
+from homeassistant.const import TEMP_CELSIUS, TIME_HOURS, MASS_KILOGRAMS, PERCENTAGE
 from .entity import RikaFirenetEntity
 
 from .const import (
@@ -21,6 +21,7 @@ DEVICE_SENSORS = [
     "room temperature",
     "room thermostat",
     "room power request",
+    "heating power"
 ]
 
 
@@ -69,6 +70,8 @@ class RikaFirenetStoveSensor(RikaFirenetEntity):
             return self._stove.get_room_thermostat()
         elif self._sensor == "room power request":
             return self._stove.get_room_power_request()
+        elif self._sensor == "heating power":
+            return self._stove.get_heating_power()
 
     @property
     def unit_of_measurement(self):
@@ -78,6 +81,8 @@ class RikaFirenetStoveSensor(RikaFirenetEntity):
             return MASS_KILOGRAMS
         elif self._sensor == "stove runtime":
             return TIME_HOURS
+        elif self._sensor == "heating power":
+            return PERCENTAGE
 
     @property
     def icon(self):
@@ -91,3 +96,5 @@ class RikaFirenetStoveSensor(RikaFirenetEntity):
             return "mdi:fire"
         elif self._sensor == "stove status":
             return "mdi:information-outline"
+        elif self._sensor == "heating power":
+            return "mdi:speedometer"

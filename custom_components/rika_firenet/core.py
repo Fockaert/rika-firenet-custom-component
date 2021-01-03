@@ -197,6 +197,15 @@ class RikaFirenetStove:
     def get_stove_operation_mode(self):
         return float(self._state['controls']['operatingMode'])
 
+    def set_stove_operation_mode(self, mode):
+        _LOGGER.info("set_stove_operation_mode(): " + str(mode))
+
+        data = self.get_control_state()
+        data['operatingMode'] = mode
+
+        self._coordinator.set_stove_controls(self._id, data)
+        self.sync_state()
+
     def get_stove_set_back_temperature(self):
         return float(self._state['controls']['setBackTemperature'])
 
@@ -214,6 +223,27 @@ class RikaFirenetStove:
 
     def get_room_power_request(self):
         return float(self._state['controls']['RoomPowerRequest'])
+
+    def set_room_power_request(self, power):
+        _LOGGER.info("set_room_power_request(): " + str(power))
+
+        data = self.get_control_state()
+        data['RoomPowerRequest'] = power
+
+        self._coordinator.set_stove_controls(self._id, data)
+        self.sync_state()
+
+    def get_heating_power(self):
+        return float(self._state['controls']['heatingPower'])
+
+    def set_heating_power(self, power):
+        _LOGGER.info("set_heating_power(): " + str(power))
+
+        data = self.get_control_state()
+        data['heatingPower'] = power
+
+        self._coordinator.set_stove_controls(self._id, data)
+        self.sync_state()
 
     def is_stove_burning(self):
         if self._state['sensors']['statusMainState'] == 4 or self._state['sensors']['statusMainState'] == 5:
