@@ -24,7 +24,8 @@
         "data": {
           "defaultTemperature": "Default temperature",
           "climate": "Climate enabled",
-          "sensor": "Sensor enabled"
+          "sensor": "Sensor enabled",
+          "switch": "Switch enabled"
         }
       }
     }

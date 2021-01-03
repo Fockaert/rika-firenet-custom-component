@@ -287,11 +287,17 @@ class RikaFirenetStove:
         self._coordinator.set_stove_controls(self._id, data)
         self.sync_state()
 
+    def turn_on(self):
+        self.turn_on_off(True)
+
     def turn_off(self):
+        self.turn_on_off(False)
+
+    def turn_on_off(self, on_off=True):
         _LOGGER.info("turn_off(): ")
 
         data = self.get_control_state()
-        data['onOff'] = False
+        data['onOff'] = on_off
 
         self._coordinator.set_stove_controls(self._id, data)
         self.sync_state()

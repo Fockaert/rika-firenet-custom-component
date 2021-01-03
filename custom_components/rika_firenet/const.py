@@ -12,7 +12,8 @@ UPDATE_TRACK = "update_track"
 # Platforms
 CLIMATE = "climate"
 SENSOR = "sensor"
-PLATFORMS = [CLIMATE, SENSOR]
+SWITCH = "switch"
+PLATFORMS = [CLIMATE, SENSOR, SWITCH]
 
 # Types
 SUPPORT_PRESET = [PRESET_AWAY, PRESET_HOME]
