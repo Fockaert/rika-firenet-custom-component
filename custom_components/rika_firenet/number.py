@@ -39,13 +39,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
     def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, number):
         super().__init__(config_entry, stove, coordinator, number)
-        _LOGGER.info("setting up platform number " + number)
 
         self._number = number
 
     @property
     def min_value(self) -> float:
-        _LOGGER.info("min_value " + self._number)
         if self._number == "room power request":
             return 1
 
@@ -53,8 +51,6 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
 
     @property
     def max_value(self) -> float:
-        _LOGGER.info("max_value " + self._number)
-
         if self._number == "room power request":
             return 4
 
@@ -62,8 +58,6 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
 
     @property
     def step(self) -> float:
-        _LOGGER.info("step " + self._number)
-
         if self._number == "room power request":
             return 1
 
@@ -71,8 +65,6 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
 
     @property
     def value(self):
-        _LOGGER.info("value " + self._number)
-
         if self._number == "room power request":
             _LOGGER.info("value " + self._number + " " + str(self._stove.get_room_power_request()))
             return self._stove.get_room_power_request()
@@ -82,14 +74,20 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
 
     @property
     def unit_of_measurement(self):
-        return PERCENTAGE
+        if self._number == "heating power":
+            return PERCENTAGE
 
     @property
     def icon(self):
         return "mdi:speedometer"
 
     def set_value(self, value: float) -> None:
-        _LOGGER.info("set_value " + str(value))
+        _LOGGER.info("set_value " + self._number + " " + str(value))
 
     async def async_set_value(self, value: float) -> None:
-        _LOGGER.info("async_set_value" + str(value))
+        _LOGGER.info("async_set_value " + self._number + " " + str(value))
+
+        if self._number == "room power request":
+            self._stove.set_room_power_request(value)
+        elif self._number == "heating power":
+            self._stove.set_heating_power(value)
