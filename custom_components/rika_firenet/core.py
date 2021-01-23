@@ -222,7 +222,7 @@ class RikaFirenetStove:
         return float(self._state['sensors']['inputRoomTemperature'])
 
     def get_room_power_request(self):
-        return float(self._state['controls']['RoomPowerRequest'])
+        return int(self._state['controls']['RoomPowerRequest'])
 
     def set_room_power_request(self, power):
         _LOGGER.info("set_room_power_request(): " + str(power))
@@ -234,7 +234,7 @@ class RikaFirenetStove:
         self.sync_state()
 
     def get_heating_power(self):
-        return float(self._state['controls']['heatingPower'])
+        return int(self._state['controls']['heatingPower'])
 
     def set_heating_power(self, power):
         _LOGGER.info("set_heating_power(): " + str(power))
