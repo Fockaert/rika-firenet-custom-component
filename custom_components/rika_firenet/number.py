@@ -81,13 +81,10 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
     def icon(self):
         return "mdi:speedometer"
 
-    def set_value(self, value: float) -> None:
-        _LOGGER.info("set_value " + self._number + " " + str(value))
-
     async def async_set_value(self, value: float) -> None:
         _LOGGER.info("async_set_value " + self._number + " " + str(value))
 
         if self._number == "room power request":
-            self._stove.set_room_power_request(value)
+            self._stove.set_room_power_request(int(value))
         elif self._number == "heating power":
-            self._stove.set_heating_power(value)
+            self._stove.set_heating_power(int(value))
