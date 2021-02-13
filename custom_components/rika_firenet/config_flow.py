@@ -1,3 +1,4 @@
+import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -5,6 +6,7 @@ from homeassistant.core import callback
 from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD, CONF_USERNAME, DOMAIN, PLATFORMS)
 from .core import RikaFirenetCoordinator
 
+_LOGGER = logging.getLogger(__name__)
 
 class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -67,6 +69,7 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             coordinator.setup()
             return True
         except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception("test_credentials_exception")
             pass
         return False
 
