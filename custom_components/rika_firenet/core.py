@@ -17,7 +17,7 @@ SCAN_INTERVAL = timedelta(seconds=15)
 
 
 class RikaFirenetCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass, username, password, default_temperature):
+    def __init__(self, hass, username, password, default_temperature, config_flow=False):
         self.hass = hass
         self._username = username
         self._password = password
@@ -26,13 +26,14 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
         self._stoves = None
         self.platforms = []
 
-        super().__init__(
-            hass,
-            _LOGGER,
-            name=DOMAIN,
-            update_method=self.async_update_data,
-            update_interval=SCAN_INTERVAL
-        )
+        if not config_flow:
+            super().__init__(
+                hass,
+                _LOGGER,
+                name=DOMAIN,
+                update_method=self.async_update_data,
+                update_interval=SCAN_INTERVAL
+            )
 
     async def async_update_data(self):
         try:
