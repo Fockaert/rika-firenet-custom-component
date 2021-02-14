@@ -14,8 +14,13 @@ _LOGGER = logging.getLogger(__name__)
 
 DEVICE_NUMBERS = [
     "room power request",
-    "heating power"
+    "heating power",
+    "convection fan1 level",
+    "convection fan1 area",
+    "convection fan2 level",
+    "convection fan2 area"
 ]
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     _LOGGER.info("setting up platform number")
@@ -46,6 +51,14 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
     def min_value(self) -> float:
         if self._number == "room power request":
             return 1
+        elif self._number == "convection fan1 level":
+            return 0
+        elif self._number == "convection fan1 area":
+            return -30
+        elif self._number == "convection fan2 level":
+            return 0
+        elif self._number == "convection fan2 area":
+            return -30
 
         return 0
 
@@ -53,6 +66,14 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
     def max_value(self) -> float:
         if self._number == "room power request":
             return 4
+        elif self._number == "convection fan1 level":
+            return 5
+        elif self._number == "convection fan1 area":
+            return 30
+        elif self._number == "convection fan2 level":
+            return 5
+        elif self._number == "convection fan2 area":
+            return 30
 
         return 100
 
@@ -60,21 +81,39 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
     def step(self) -> float:
         if self._number == "room power request":
             return 1
+        elif self._number == "convection fan1 level":
+            return 1
+        elif self._number == "convection fan1 area":
+            return 1
+        elif self._number == "convection fan2 level":
+            return 1
+        elif self._number == "convection fan2 area":
+            return 1
 
         return 10
 
     @property
     def value(self):
         if self._number == "room power request":
-            _LOGGER.info("value " + self._number + " " + str(self._stove.get_room_power_request()))
             return self._stove.get_room_power_request()
         elif self._number == "heating power":
-            _LOGGER.info("value " + self._number + " " + str(self._stove.get_heating_power()))
             return self._stove.get_heating_power()
+        elif self._number == "convection fan1 level":
+            return self._stove.get_convection_fan1_level()
+        elif self._number == "convection fan1 area":
+            return self._stove.get_convection_fan1_area()
+        elif self._number == "convection fan2 level":
+            return self._stove.get_convection_fan2_level()
+        elif self._number == "convection fan2 area":
+            return self._stove.get_convection_fan2_area()
 
     @property
     def unit_of_measurement(self):
         if self._number == "heating power":
+            return PERCENTAGE
+        elif self._number == "convection fan1 area":
+            return PERCENTAGE
+        elif self._number == "convection fan2 area":
             return PERCENTAGE
 
     @property
@@ -88,3 +127,11 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
             self._stove.set_room_power_request(int(value))
         elif self._number == "heating power":
             self._stove.set_heating_power(int(value))
+        elif self._number == "convection fan1 level":
+            return self._stove.set_convection_fan1_level(int(value))
+        elif self._number == "convection fan1 area":
+            return self._stove.set_convection_fan1_area(int(value))
+        elif self._number == "convection fan2 level":
+            return self._stove.set_convection_fan2_level(int(value))
+        elif self._number == "convection fan2 area":
+            return self._stove.set_convection_fan2_area(int(value))
