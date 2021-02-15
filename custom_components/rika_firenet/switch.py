@@ -43,8 +43,8 @@ class RikaFirenetStoveBinarySwitch(RikaFirenetEntity, SwitchEntity):
 
         self._number = number
 
-    async def async_turn_on(self, **kwargs):  # pylint: disable=unused-argument
-        _LOGGER.info("async_turn_on " + self._number)
+    def turn_on(self, **kwargs):  # pylint: disable=unused-argument
+        _LOGGER.info("turn_on " + self._number)
 
         if self._number == "on off":
             self._stove.turn_on()
@@ -53,8 +53,10 @@ class RikaFirenetStoveBinarySwitch(RikaFirenetEntity, SwitchEntity):
         elif self._number == "convection fan2":
             self._stove.turn_convection_fan2_on()
 
-    async def async_turn_off(self, **kwargs):  # pylint: disable=unused-argument
-        _LOGGER.info("async_turn_off " + self._number)
+        self.schedule_update_ha_state()
+
+    def turn_off(self, **kwargs):  # pylint: disable=unused-argument
+        _LOGGER.info("turn_off " + self._number)
 
         if self._number == "on off":
             self._stove.turn_off()
@@ -62,6 +64,8 @@ class RikaFirenetStoveBinarySwitch(RikaFirenetEntity, SwitchEntity):
             self._stove.turn_convection_fan1_off()
         elif self._number == "convection fan2":
             self._stove.turn_convection_fan2_off()
+
+        self.schedule_update_ha_state()
 
     @property
     def icon(self):

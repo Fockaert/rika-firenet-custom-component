@@ -60,6 +60,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
     def set_preset_mode(self, preset_mode):
         """Set new preset mode."""
         self._stove.set_presence(preset_mode)
+        self.schedule_update_ha_state()
 
     @property
     def target_temperature(self):
@@ -81,6 +82,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
     def set_hvac_mode(self, hvac_mode):
         _LOGGER.info('set_hvac_mode()): ' + str(hvac_mode))
         self._stove.set_hvac_mode(str(hvac_mode))
+        self.schedule_update_ha_state()
 
     @property
     def supported_features(self):

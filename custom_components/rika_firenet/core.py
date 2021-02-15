@@ -82,7 +82,11 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
 
     def get_stove_state(self, id):
         self.connect()
-        return self._client.get('https://www.rika-firenet.com/api/client/' + id + '/status?nocache=').json()
+        url = 'https://www.rika-firenet.com/api/client/' + id + '/status?nocache=' + str(int(time.time()))
+        data = self._client.get(url).json()
+        # _LOGGER.debug('get_stove_state(), url=' + url + ', response=' + str(data))
+
+        return data
 
     def setup_stoves(self):
         self.connect()
@@ -146,9 +150,6 @@ class RikaFirenetStove:
         return 'Stove(id=' + self._id + ', name=' + self._name + ')'
 
     def sync_state(self):
-        return self.sync_state_internal(True)
-
-    def sync_state_internal(self, send_message):
         _LOGGER.debug("Updating stove %s", self._id)
         self._state = self._coordinator.get_stove_state(self._id)
 
