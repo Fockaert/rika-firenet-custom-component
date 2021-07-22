@@ -64,12 +64,13 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     async def _test_credentials(self, username, password):
         """Return true if credentials is valid."""
         try:
-            coordinator = RikaFirenetCoordinator(None, username, password, 21, True)
-            coordinator.setup()
+            coordinator = RikaFirenetCoordinator(self.hass, username, password, 21, True)
+            await self.hass.async_add_executor_job(coordinator.setup)
             return True
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("test_credentials_exception")
             pass
+
         return False
 
 
