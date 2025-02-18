@@ -1,6 +1,10 @@
 import logging
 
-from homeassistant.const import TEMP_CELSIUS, TIME_HOURS, MASS_KILOGRAMS, PERCENTAGE
+from homeassistant.const import UnitOfMass
+from homeassistant.const import UnitOfTemperature
+from homeassistant.const import PERCENTAGE
+from homeassistant.const import UnitOfTime
+
 from .entity import RikaFirenetEntity
 
 from .const import (
@@ -76,11 +80,11 @@ class RikaFirenetStoveSensor(RikaFirenetEntity):
     @property
     def unit_of_measurement(self):
         if "temperature" in self._sensor or "thermostat" in self._sensor:
-            return TEMP_CELSIUS
+            return UnitOfTemperature.CELSIUS
         elif self._sensor == "stove consumption":
-            return MASS_KILOGRAMS
+            return UnitOfMass.KILOGRAMS
         elif self._sensor == "stove runtime":
-            return TIME_HOURS
+            return UnitOfTime.HOURS
         elif self._sensor == "heating power":
             return PERCENTAGE
 
