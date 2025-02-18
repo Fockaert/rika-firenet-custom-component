@@ -1,11 +1,9 @@
 import logging
 
 from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (HVAC_MODE_AUTO,
-                                                    HVAC_MODE_HEAT,
-                                                    HVAC_MODE_OFF,
-                                                    SUPPORT_TARGET_TEMPERATURE)
-from homeassistant.const import (ATTR_TEMPERATURE, TEMP_CELSIUS)
+from homeassistant.components.climate.const import HVACMode, ClimateEntityFeature
+
+from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature)
 
 from .const import (DOMAIN, SUPPORT_PRESET)
 from .core import RikaFirenetCoordinator
@@ -13,12 +11,12 @@ from .entity import RikaFirenetEntity
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE  # | SUPPORT_PRESET_MODE
+SUPPORT_FLAGS = ClimateEntityFeature.TARGET_TEMPERATURE  # | SUPPORT_PRESET_MODE
 
 MIN_TEMP = 16
 MAX_TEMP = 30
 
-HVAC_MODES = [HVAC_MODE_AUTO, HVAC_MODE_HEAT, HVAC_MODE_OFF]
+HVAC_MODES = [HVACMode.AUTO, HVACMode.HEAT, HVACMode.OFF]
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -90,7 +88,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
 
     @property
     def temperature_unit(self):
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     def set_temperature(self, **kwargs):
         temperature = int(kwargs.get(ATTR_TEMPERATURE))

@@ -4,10 +4,8 @@ from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
-from homeassistant.components.climate.const import (HVAC_MODE_AUTO,
-                                                    HVAC_MODE_HEAT,
-                                                    HVAC_MODE_OFF, PRESET_AWAY,
-                                                    PRESET_HOME)
+from homeassistant.components.climate.const import HVACMode, PRESET_AWAY, PRESET_HOME
+
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from .const import DOMAIN
 
@@ -315,22 +313,22 @@ class RikaFirenetStove:
 
     def get_hvac_mode(self):
         if not self.is_stove_on():
-            return HVAC_MODE_OFF
+            return HVACMode.OFF
 
-        if self.get_stove_operation_mode() is 0:
-            return HVAC_MODE_HEAT
+        if self.get_stove_operation_mode() == 0:
+            return HVACMode.HEAT
 
         if not self.is_heating_times_active_for_comfort():
-            return HVAC_MODE_HEAT
+            return HVACMode.HEAT
 
-        return HVAC_MODE_AUTO
+        return HVACMode.AUTO
 
     def set_hvac_mode(self, hvac_mode):
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             self.turn_off()
-        elif hvac_mode == HVAC_MODE_AUTO:
+        elif hvac_mode == HVACMode.AUTO:
             self.set_heating_times_active_for_comfort(True)
-        elif hvac_mode == HVAC_MODE_HEAT:
+        elif hvac_mode == HVACMode.HEAT:
             self.set_heating_times_active_for_comfort(False)
 
     def set_heating_times_active_for_comfort(self, active):
