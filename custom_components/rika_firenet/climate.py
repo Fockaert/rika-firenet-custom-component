@@ -92,15 +92,26 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
         return UnitOfTemperature.CELSIUS
 
     def set_temperature(self, **kwargs):
-        temperature = int(kwargs.get(ATTR_TEMPERATURE))
-        _LOGGER.info('set_temperature(): ' + str(temperature))
-
         if kwargs.get(ATTR_TEMPERATURE) is None:
+            _LOGGER.warning("Temperature value not provided")
             return
 
         if not self._stove.is_stove_on():
+            _LOGGER.debug("Stove is off, skipping temperature change")
             return
 
-        # do nothing if HVAC is switched off
-        self._stove.set_stove_temperature(temperature)
+        temperature = float(kwargs.get(ATTR_TEMPERATURE))
+
+        # Validate temperature range
+        if temperature < MIN_TEMP or temperature > MAX_TEMP:
+            _LOGGER.error(
+                "Temperature %s out of range [%s, %s]",
+                temperature, MIN_TEMP, MAX_TEMP
+            )
+            raise RikaValidationError(
+                f"Temperature {temperature} out of valid range [{MIN_TEMP}, {MAX_TEMP}]"
+            )
+
+        _LOGGER.debug('set_temperature(): %s', temperature)
+        self._stove.set_stove_temperature(int(temperature))
         self.schedule_update_ha_state()
