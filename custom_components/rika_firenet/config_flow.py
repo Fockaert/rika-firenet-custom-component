@@ -73,11 +73,18 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             coordinator = RikaFirenetCoordinator(self.hass, username, password, 21, True)
             await self.hass.async_add_executor_job(coordinator.setup)
             return True
-        except Exception:  # pylint: disable=broad-except
-            _LOGGER.exception("test_credentials_exception")
-            pass
-
-        return False
+        except RikaAuthenticationError as exception:
+            _LOGGER.error("Authentication failed: %s", exception)
+            return False
+        except RikaTimeoutError as exception:
+            _LOGGER.error("Connection timeout: %s", exception)
+            return False
+        except (RikaConnectionError, RikaApiError) as exception:
+            _LOGGER.error("Connection error: %s", exception)
+            return False
+        except Exception as exception:
+            _LOGGER.exception("Unexpected error testing credentials: %s", exception)
+            return False
 
 
 class RikaFirenetOptionsFlowHandler(config_entries.OptionsFlow):
