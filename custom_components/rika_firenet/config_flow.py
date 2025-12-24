@@ -3,7 +3,13 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 
-from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD, CONF_USERNAME, DOMAIN, PLATFORMS)
+from .const import (
+    CONF_DEFAULT_TEMPERATURE,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    DOMAIN,
+    PLATFORMS,
+)
 from .core import RikaFirenetCoordinator
 from .exceptions import (
     RikaAuthenticationError,
@@ -13,6 +19,7 @@ from .exceptions import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -57,8 +64,12 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             user_input = {}
 
         schema_properties = {
-            vol.Required(CONF_USERNAME, default=user_input.get(CONF_USERNAME, None)): str,
-            vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, None)): str,
+            vol.Required(
+                CONF_USERNAME, default=user_input.get(CONF_USERNAME, None)
+            ): str,
+            vol.Required(
+                CONF_PASSWORD, default=user_input.get(CONF_PASSWORD, None)
+            ): str,
         }
 
         return self.async_show_form(
@@ -70,7 +81,9 @@ class RikaFirenetFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     async def _test_credentials(self, username, password):
         """Return true if credentials is valid."""
         try:
-            coordinator = RikaFirenetCoordinator(self.hass, username, password, 21, True)
+            coordinator = RikaFirenetCoordinator(
+                self.hass, username, password, 21, True
+            )
             await self.hass.async_add_executor_job(coordinator.setup)
             return True
         except RikaAuthenticationError as exception:
@@ -106,13 +119,18 @@ class RikaFirenetOptionsFlowHandler(config_entries.OptionsFlow):
             return await self._update_options()
 
         schema_properties = {
-            vol.Required(CONF_DEFAULT_TEMPERATURE, default=self.options.get(CONF_DEFAULT_TEMPERATURE)): int
+            vol.Required(
+                CONF_DEFAULT_TEMPERATURE,
+                default=self.options.get(CONF_DEFAULT_TEMPERATURE),
+            ): int
         }
 
-        schema_properties.update({
-            vol.Required(x, default=self.options.get(x, True)): bool
-            for x in sorted(PLATFORMS)
-        })
+        schema_properties.update(
+            {
+                vol.Required(x, default=self.options.get(x, True)): bool
+                for x in sorted(PLATFORMS)
+            }
+        )
 
         return self.async_show_form(
             step_id="user",

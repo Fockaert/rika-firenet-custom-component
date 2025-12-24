@@ -3,9 +3,9 @@ import logging
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import HVACMode, ClimateEntityFeature
 
-from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature)
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 
-from .const import (DOMAIN, SUPPORT_PRESET)
+from .const import DOMAIN, SUPPORT_PRESET
 from .core import RikaFirenetCoordinator
 from .entity import RikaFirenetEntity
 from .exceptions import RikaValidationError
@@ -40,7 +40,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
     @property
     def current_temperature(self):
         temp = self._stove.get_room_temperature()
-        _LOGGER.debug('current_temperature(): %s', temp)
+        _LOGGER.debug("current_temperature(): %s", temp)
         return temp
 
     @property
@@ -79,7 +79,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
         return HVAC_MODES
 
     def set_hvac_mode(self, hvac_mode):
-        _LOGGER.debug('set_hvac_mode(): %s', hvac_mode)
+        _LOGGER.debug("set_hvac_mode(): %s", hvac_mode)
         self._stove.set_hvac_mode(str(hvac_mode))
         self.schedule_update_ha_state()
 
@@ -105,13 +105,12 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
         # Validate temperature range
         if temperature < MIN_TEMP or temperature > MAX_TEMP:
             _LOGGER.error(
-                "Temperature %s out of range [%s, %s]",
-                temperature, MIN_TEMP, MAX_TEMP
+                "Temperature %s out of range [%s, %s]", temperature, MIN_TEMP, MAX_TEMP
             )
             raise RikaValidationError(
                 f"Temperature {temperature} out of valid range [{MIN_TEMP}, {MAX_TEMP}]"
             )
 
-        _LOGGER.debug('set_temperature(): %s', temperature)
+        _LOGGER.debug("set_temperature(): %s", temperature)
         self._stove.set_stove_temperature(int(temperature))
         self.schedule_update_ha_state()

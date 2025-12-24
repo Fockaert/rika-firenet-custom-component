@@ -4,8 +4,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD,
-                    CONF_USERNAME, DOMAIN, PLATFORMS, STARTUP_MESSAGE)
+from .const import (
+    CONF_DEFAULT_TEMPERATURE,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    DOMAIN,
+    PLATFORMS,
+    STARTUP_MESSAGE,
+)
 from .core import RikaFirenetCoordinator
 from .exceptions import (
     RikaAuthenticationError,
@@ -18,12 +24,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
-    _LOGGER.info('setup_platform()')
+    _LOGGER.info("setup_platform()")
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    _LOGGER.info('async_setup_entry(): %s', entry.entry_id)
+    _LOGGER.info("async_setup_entry(): %s", entry.entry_id)
 
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
@@ -69,7 +75,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Handle removal of an entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    unloaded = await hass.config_entries.async_unload_platforms(entry, coordinator.platforms)
+    unloaded = await hass.config_entries.async_unload_platforms(
+        entry, coordinator.platforms
+    )
 
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id)

@@ -4,9 +4,7 @@ from homeassistant.const import PERCENTAGE
 from .entity import RikaFirenetEntity
 from homeassistant.components.number import NumberEntity
 
-from .const import (
-    DOMAIN
-)
+from .const import DOMAIN
 from .core import RikaFirenetCoordinator
 from .core import RikaFirenetStove
 from .exceptions import RikaValidationError
@@ -19,7 +17,7 @@ DEVICE_NUMBERS = [
     "convection fan1 level",
     "convection fan1 area",
     "convection fan2 level",
-    "convection fan2 area"
+    "convection fan2 area",
 ]
 
 
@@ -43,7 +41,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
-    def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, number):
+    def __init__(
+        self,
+        config_entry,
+        stove: RikaFirenetStove,
+        coordinator: RikaFirenetCoordinator,
+        number,
+    ):
         super().__init__(config_entry, stove, coordinator, number)
 
         self._number = number
@@ -129,7 +133,10 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
         if value < min_value or value > max_value:
             _LOGGER.error(
                 "Value %s for %s out of range [%s, %s]",
-                value, self._number, min_value, max_value
+                value,
+                self._number,
+                min_value,
+                max_value,
             )
             raise RikaValidationError(
                 f"Value {value} for {self._number} out of valid range [{min_value}, {max_value}]"

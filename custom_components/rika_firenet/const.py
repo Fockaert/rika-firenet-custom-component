@@ -1,5 +1,4 @@
-from homeassistant.components.climate.const import (PRESET_AWAY,
-                                                    PRESET_HOME)
+from homeassistant.components.climate.const import PRESET_AWAY, PRESET_HOME
 
 # Configuration
 CONF_ENABLED = "enabled"
@@ -56,4 +55,3 @@ API_BASE_URL = "https://www.rika-firenet.com"
 API_LOGIN_URL = f"{API_BASE_URL}/web/login"
 API_STOVES_URL = f"{API_BASE_URL}/web/summary"
 API_CLIENT_URL = f"{API_BASE_URL}/api/client"
-

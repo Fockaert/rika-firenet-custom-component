@@ -7,9 +7,7 @@ from homeassistant.const import UnitOfTime
 
 from .entity import RikaFirenetEntity
 
-from .const import (
-    DOMAIN
-)
+from .const import DOMAIN
 from .core import RikaFirenetCoordinator
 from .core import RikaFirenetStove
 
@@ -25,7 +23,7 @@ DEVICE_SENSORS = [
     "room temperature",
     "room thermostat",
     "room power request",
-    "heating power"
+    "heating power",
 ]
 
 
@@ -49,7 +47,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class RikaFirenetStoveSensor(RikaFirenetEntity):
-    def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, sensor):
+    def __init__(
+        self,
+        config_entry,
+        stove: RikaFirenetStove,
+        coordinator: RikaFirenetCoordinator,
+        sensor,
+    ):
         super().__init__(config_entry, stove, coordinator, sensor)
 
         self._sensor = sensor
