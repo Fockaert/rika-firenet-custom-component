@@ -40,3 +40,20 @@ If you have any issues with this you need to open an issue here:
 {ISSUE_URL}
 -------------------------------------------------------------------
 """
+
+# HTTP Configuration
+HTTP_TIMEOUT = 10  # seconds
+HTTP_RETRY_DELAY = 2  # seconds
+HTTP_RETRY_MAX_ATTEMPTS = 10
+
+# Stove States
+STOVE_STATE_OFF = 1
+STOVE_STATE_RUNNING = 4
+STOVE_STATE_HEATING = 5
+
+# API URLs
+API_BASE_URL = "https://www.rika-firenet.com"
+API_LOGIN_URL = f"{API_BASE_URL}/web/login"
+API_STOVES_URL = f"{API_BASE_URL}/web/summary"
+API_CLIENT_URL = f"{API_BASE_URL}/api/client"
+
