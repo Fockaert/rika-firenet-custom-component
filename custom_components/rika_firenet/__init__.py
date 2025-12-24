@@ -23,7 +23,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    _LOGGER.info('async_setup_entry():' + str(entry.entry_id))
+    _LOGGER.info('async_setup_entry(): %s', entry.entry_id)
 
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})

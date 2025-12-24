@@ -94,10 +94,10 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
         if 'connect.sid' not in self._client.cookies:
             return False
 
-        expiresIn = list(self._client.cookies)[0].expires
-        epochNow = int(datetime.now().strftime('%s'))
+        expires_in = list(self._client.cookies)[0].expires
+        epoch_now = int(datetime.now().timestamp())
 
-        if expiresIn <= epochNow:
+        if expires_in <= epoch_now:
             return False
 
         return True
@@ -132,20 +132,26 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
         except requests.exceptions.RequestException as exception:
             raise RikaApiError(f"Failed to get stove list: {exception}") from exception
 
-        if stoveList is None:
+        soup = BeautifulSoup(response.content, "html.parser")
+        stove_list = soup.find("ul", {"id": "stoveList"})
+
+        if stove_list is None:
+            _LOGGER.warning("No stoves found in account")
             return stoves
 
-        for stove in stoveList.findAll('li'):
-            stoveLink = stove.find('a', href=True)
-            stoveName = stoveLink.attrs['href'].rsplit('/', 1)[-1]
-            stove = RikaFirenetStove(self, stoveName, stoveLink.text)
-            _LOGGER.info("Found stove : {}".format(stove))
+        for stove_element in stove_list.findAll('li'):
+            stove_link = stove_element.find('a', href=True)
+            if not stove_link:
+                continue
+            stove_id = stove_link.attrs['href'].rsplit('/', 1)[-1]
+            stove = RikaFirenetStove(self, stove_id, stove_link.text)
+            _LOGGER.info("Found stove: %s", stove)
             stoves.append(stove)
 
         return stoves
 
     def update(self):
-        _LOGGER.info("update()")
+        _LOGGER.debug("Updating all stoves")
         for stove in self._stoves:
             stove.sync_state()
 
@@ -352,10 +358,8 @@ class RikaFirenetStove:
         self.sync_state()
 
     def is_stove_burning(self):
-        if self._state['sensors']['statusMainState'] == 4 or self._state['sensors']['statusMainState'] == 5:
-            return True
-        else:
-            return False
+        main_state = self._state['sensors']['statusMainState']
+        return main_state in (STOVE_STATE_RUNNING, STOVE_STATE_HEATING)
 
     def get_status_text(self):
         return self.get_status()[1]

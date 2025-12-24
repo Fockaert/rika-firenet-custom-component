@@ -40,7 +40,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
     @property
     def current_temperature(self):
         temp = self._stove.get_room_temperature()
-        _LOGGER.info('current_temperature(): ' + str(temp))
+        _LOGGER.debug('current_temperature(): %s', temp)
         return temp
 
     @property
@@ -79,7 +79,7 @@ class RikaFirenetStoveClimate(RikaFirenetEntity, ClimateEntity):
         return HVAC_MODES
 
     def set_hvac_mode(self, hvac_mode):
-        _LOGGER.info('set_hvac_mode()): ' + str(hvac_mode))
+        _LOGGER.debug('set_hvac_mode(): %s', hvac_mode)
         self._stove.set_hvac_mode(str(hvac_mode))
         self.schedule_update_ha_state()
 
