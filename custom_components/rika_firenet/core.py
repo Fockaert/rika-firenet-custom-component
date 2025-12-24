@@ -8,6 +8,12 @@ from homeassistant.components.climate.const import HVACMode, PRESET_AWAY, PRESET
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from .const import DOMAIN
+from .exceptions import (
+    RikaAuthenticationError,
+    RikaApiError,
+    RikaConnectionError,
+    RikaTimeoutError,
+)
 
 _LOGGER = logging.getLogger(__name__)
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=10)

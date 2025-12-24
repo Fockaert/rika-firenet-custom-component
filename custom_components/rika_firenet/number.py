@@ -9,6 +9,7 @@ from .const import (
 )
 from .core import RikaFirenetCoordinator
 from .core import RikaFirenetStove
+from .exceptions import RikaValidationError
 
 _LOGGER = logging.getLogger(__name__)
 

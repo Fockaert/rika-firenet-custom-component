@@ -5,6 +5,12 @@ from homeassistant.core import callback
 
 from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD, CONF_USERNAME, DOMAIN, PLATFORMS)
 from .core import RikaFirenetCoordinator
+from .exceptions import (
+    RikaAuthenticationError,
+    RikaConnectionError,
+    RikaTimeoutError,
+    RikaApiError,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

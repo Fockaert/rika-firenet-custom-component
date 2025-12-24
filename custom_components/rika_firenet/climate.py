@@ -8,6 +8,7 @@ from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature)
 from .const import (DOMAIN, SUPPORT_PRESET)
 from .core import RikaFirenetCoordinator
 from .entity import RikaFirenetEntity
+from .exceptions import RikaValidationError
 
 _LOGGER = logging.getLogger(__name__)
 
