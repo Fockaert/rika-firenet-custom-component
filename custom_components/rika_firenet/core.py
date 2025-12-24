@@ -42,8 +42,10 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
     async def async_update_data(self):
         try:
             await self.hass.async_add_executor_job(self.update)
-        except Exception as exception:
-            raise UpdateFailed(exception)
+        except (RikaAuthenticationError, RikaApiError, RikaConnectionError, RikaTimeoutError) as exception:
+            raise UpdateFailed(f"Error updating Rika Firenet data: {exception}") from exception
+        except requests.exceptions.RequestException as exception:
+            raise UpdateFailed(f"Network error: {exception}") from exception
 
     def setup(self):
         _LOGGER.info("setup()")
@@ -65,12 +67,18 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
             'password': self._password
         }
 
-        postResponse = self._client.post('https://www.rika-firenet.com/web/login', data)
+        try:
+            post_response = self._client.post(API_LOGIN_URL, data, timeout=HTTP_TIMEOUT)
+            post_response.raise_for_status()
+        except requests.exceptions.Timeout as exception:
+            raise RikaTimeoutError("Timeout connecting to Rika Firenet") from exception
+        except requests.exceptions.RequestException as exception:
+            raise RikaConnectionError(f"Failed to connect to Rika Firenet: {exception}") from exception
 
-        if not ('/logout' in postResponse.text):
-            raise Exception('Failed to connect with Rika Firenet')
-        else:
-            _LOGGER.info('Connected to Rika Firenet')
+        if post_response.status_code != 200 or '/logout' not in post_response.text:
+            raise RikaAuthenticationError('Authentication failed - invalid credentials or server error')
+
+        _LOGGER.debug('Connected to Rika Firenet')
 
     def is_authenticated(self):
         if 'connect.sid' not in self._client.cookies:
@@ -84,21 +92,35 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
 
         return True
 
-    def get_stove_state(self, id):
+    def get_stove_state(self, stove_id):
         self.connect()
-        url = 'https://www.rika-firenet.com/api/client/' + id + '/status?nocache=' + str(int(time.time()))
-        data = self._client.get(url, timeout=10).json()
-        # _LOGGER.debug('get_stove_state(), url=' + url + ', response=' + str(data))
+        url = f"{API_CLIENT_URL}/{stove_id}/status?nocache={int(time.time())}"
 
+        try:
+            response = self._client.get(url, timeout=HTTP_TIMEOUT)
+            response.raise_for_status()
+            data = response.json()
+        except requests.exceptions.Timeout as exception:
+            raise RikaTimeoutError(f"Timeout getting stove state for {stove_id}") from exception
+        except requests.exceptions.RequestException as exception:
+            raise RikaApiError(f"Failed to get stove state: {exception}") from exception
+        except ValueError as exception:
+            raise RikaApiError(f"Invalid JSON response: {exception}") from exception
+
+        _LOGGER.debug("get_stove_state() for %s: %s", stove_id, data)
         return data
 
     def setup_stoves(self):
         self.connect()
         stoves = []
-        postResponse = self._client.get('https://www.rika-firenet.com/web/summary')
 
-        soup = BeautifulSoup(postResponse.content, "html.parser")
-        stoveList = soup.find("ul", {"id": "stoveList"})
+        try:
+            response = self._client.get(API_STOVES_URL, timeout=HTTP_TIMEOUT)
+            response.raise_for_status()
+        except requests.exceptions.Timeout as exception:
+            raise RikaTimeoutError("Timeout getting stove list") from exception
+        except requests.exceptions.RequestException as exception:
+            raise RikaApiError(f"Failed to get stove list: {exception}") from exception
 
         if stoveList is None:
             return stoves
@@ -117,19 +139,33 @@ class RikaFirenetCoordinator(DataUpdateCoordinator):
         for stove in self._stoves:
             stove.sync_state()
 
-    def set_stove_controls(self, id, data):
-        _LOGGER.info("set_stove_control() id: " + id + " data: " + str(data))
+    def set_stove_controls(self, stove_id, data):
+        _LOGGER.debug("set_stove_control() id: %s data: %s", stove_id, data)
 
-        r = self._client.post('https://www.rika-firenet.com/api/client/' + id + '/controls', data)
+        url = f"{API_CLIENT_URL}/{stove_id}/controls"
 
-        for counter in range(0, 10):
-            if ('OK' in r.text) == True:
-                _LOGGER.info('Stove controls updated')
+        try:
+            response = self._client.post(url, data, timeout=HTTP_TIMEOUT)
+            response.raise_for_status()
+        except requests.exceptions.Timeout as exception:
+            raise RikaTimeoutError(f"Timeout setting stove controls for {stove_id}") from exception
+        except requests.exceptions.RequestException as exception:
+            raise RikaApiError(f"Failed to set stove controls: {exception}") from exception
+
+        for counter in range(HTTP_RETRY_MAX_ATTEMPTS):
+            if 'OK' in response.text:
+                _LOGGER.debug('Stove controls updated successfully')
                 return True
-            else:
-                _LOGGER.info('In progress.. ({}/10)'.format(counter))
-                time.sleep(2)
 
+            _LOGGER.debug('Waiting for control update confirmation (%d/%d)', counter + 1, HTTP_RETRY_MAX_ATTEMPTS)
+            time.sleep(HTTP_RETRY_DELAY)
+
+            try:
+                response = self._client.get(url.replace('/controls', '/status'), timeout=HTTP_TIMEOUT)
+            except requests.exceptions.RequestException:
+                pass
+
+        _LOGGER.warning("Stove control update not confirmed after %d attempts", HTTP_RETRY_MAX_ATTEMPTS)
         return False
 
 
