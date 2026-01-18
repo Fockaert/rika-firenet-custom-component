@@ -4,19 +4,13 @@ from homeassistant.components.switch import SwitchEntity
 
 from .entity import RikaFirenetEntity
 
-from .const import (
-    DOMAIN
-)
+from .const import DOMAIN
 from .core import RikaFirenetCoordinator
 from .core import RikaFirenetStove
 
 _LOGGER = logging.getLogger(__name__)
 
-DEVICE_SWITCH = [
-    "on off",
-    "convection fan1",
-    "convection fan2"
-]
+DEVICE_SWITCH = ["on off", "convection fan1", "convection fan2"]
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -38,7 +32,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class RikaFirenetStoveBinarySwitch(RikaFirenetEntity, SwitchEntity):
-    def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, number):
+    def __init__(
+        self,
+        config_entry,
+        stove: RikaFirenetStove,
+        coordinator: RikaFirenetCoordinator,
+        number,
+    ):
         super().__init__(config_entry, stove, coordinator, number)
 
         self._number = number

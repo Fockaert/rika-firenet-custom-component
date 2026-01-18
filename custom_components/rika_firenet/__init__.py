@@ -4,20 +4,32 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import (CONF_DEFAULT_TEMPERATURE, CONF_PASSWORD,
-                    CONF_USERNAME, DOMAIN, PLATFORMS, STARTUP_MESSAGE)
+from .const import (
+    CONF_DEFAULT_TEMPERATURE,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+    DOMAIN,
+    PLATFORMS,
+    STARTUP_MESSAGE,
+)
 from .core import RikaFirenetCoordinator
+from .exceptions import (
+    RikaAuthenticationError,
+    RikaConnectionError,
+    RikaTimeoutError,
+    RikaApiError,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
-    _LOGGER.info('setup_platform()')
+    _LOGGER.info("setup_platform()")
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    _LOGGER.info('async_setup_entry():' + str(entry.entry_id))
+    _LOGGER.info("async_setup_entry(): %s", entry.entry_id)
 
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
@@ -31,19 +43,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     try:
         await hass.async_add_executor_job(coordinator.setup)
-    except KeyError:
-        _LOGGER.error("Failed to login to firenet")
+    except RikaAuthenticationError as exception:
+        _LOGGER.error("Authentication failed: %s", exception)
         return False
-    except RuntimeError as exc:
-        _LOGGER.error("Failed to setup rika firenet: %s", exc)
-        return ConfigEntryNotReady
-    except requests.exceptions.Timeout as ex:
-        raise ConfigEntryNotReady from ex
-    except requests.exceptions.HTTPError as ex:
-        if ex.response.status_code > 400 and ex.response.status_code < 500:
-            _LOGGER.error("Failed to login to rika firenet: %s", ex)
-            return False
-        raise ConfigEntryNotReady from ex
+    except RikaTimeoutError as exception:
+        _LOGGER.error("Connection timeout: %s", exception)
+        raise ConfigEntryNotReady from exception
+    except (RikaConnectionError, RikaApiError) as exception:
+        _LOGGER.error("Failed to setup Rika Firenet: %s", exception)
+        raise ConfigEntryNotReady from exception
+    except KeyError as exception:
+        _LOGGER.error("Invalid response from Rika Firenet: %s", exception)
+        raise ConfigEntryNotReady from exception
 
     await coordinator.async_refresh()
 
@@ -64,7 +75,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Handle removal of an entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    unloaded = await hass.config_entries.async_unload_platforms(entry, coordinator.platforms)
+    unloaded = await hass.config_entries.async_unload_platforms(
+        entry, coordinator.platforms
+    )
 
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id)

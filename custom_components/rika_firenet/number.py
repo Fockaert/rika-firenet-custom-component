@@ -4,11 +4,10 @@ from homeassistant.const import PERCENTAGE
 from .entity import RikaFirenetEntity
 from homeassistant.components.number import NumberEntity
 
-from .const import (
-    DOMAIN
-)
+from .const import DOMAIN
 from .core import RikaFirenetCoordinator
 from .core import RikaFirenetStove
+from .exceptions import RikaValidationError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ DEVICE_NUMBERS = [
     "convection fan1 level",
     "convection fan1 area",
     "convection fan2 level",
-    "convection fan2 area"
+    "convection fan2 area",
 ]
 
 
@@ -42,7 +41,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
-    def __init__(self, config_entry, stove: RikaFirenetStove, coordinator: RikaFirenetCoordinator, number):
+    def __init__(
+        self,
+        config_entry,
+        stove: RikaFirenetStove,
+        coordinator: RikaFirenetCoordinator,
+        number,
+    ):
         super().__init__(config_entry, stove, coordinator, number)
 
         self._number = number
@@ -121,19 +126,37 @@ class RikaFirenetStoveNumber(RikaFirenetEntity, NumberEntity):
         return "mdi:speedometer"
 
     def set_native_value(self, value: float) -> None:
-        _LOGGER.info("set_value " + self._number + " " + str(value))
+        # Validate value is within bounds
+        min_value = self.native_min_value
+        max_value = self.native_max_value
+
+        if value < min_value or value > max_value:
+            _LOGGER.error(
+                "Value %s for %s out of range [%s, %s]",
+                value,
+                self._number,
+                min_value,
+                max_value,
+            )
+            raise RikaValidationError(
+                f"Value {value} for {self._number} out of valid range [{min_value}, {max_value}]"
+            )
+
+        _LOGGER.debug("set_value %s = %s", self._number, value)
+
+        int_value = int(value)
 
         if self._number == "room power request":
-            self._stove.set_room_power_request(int(value))
+            self._stove.set_room_power_request(int_value)
         elif self._number == "heating power":
-            self._stove.set_heating_power(int(value))
+            self._stove.set_heating_power(int_value)
         elif self._number == "convection fan1 level":
-            return self._stove.set_convection_fan1_level(int(value))
+            self._stove.set_convection_fan1_level(int_value)
         elif self._number == "convection fan1 area":
-            return self._stove.set_convection_fan1_area(int(value))
+            self._stove.set_convection_fan1_area(int_value)
         elif self._number == "convection fan2 level":
-            return self._stove.set_convection_fan2_level(int(value))
+            self._stove.set_convection_fan2_level(int_value)
         elif self._number == "convection fan2 area":
-            return self._stove.set_convection_fan2_area(int(value))
+            self._stove.set_convection_fan2_area(int_value)
 
         self.schedule_update_ha_state()
